@@ -1,0 +1,135 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_split.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jabad-di <jabad-di@student.42malaga.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/20 14:36:45 by jabad-di          #+#    #+#             */
+/*   Updated: 2025/12/01 19:57:12 by jabad-di         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "libft.h"
+
+static	size_t	memory_substr(const char *s, char c, size_t j)
+{
+	size_t		i;
+	size_t		x;
+	size_t		len;
+
+	x = 0;
+	i = 0;
+	len = 0;
+	while (s[i])
+	{
+		while (s[i] && s[i] == c)
+			i++;
+		if (j == x)
+		{
+			while (s[i] && s[i] != c)
+			{
+				len++;
+				i++;
+			}
+		}
+		else
+			while (s[i] && s[i] != c)
+				i++;
+		x++;
+	}
+	return (len + 1);
+}
+
+static	char	*copy_substr(const char *s, char c, size_t j, char *second)
+{
+	size_t		i;
+	size_t		a;
+	size_t		x;
+
+	a = 0;
+	i = 0;
+	x = 0;
+	while (s[i])
+	{
+		while (s[i] && s[i] == c)
+			i++;
+		if (j == x)
+		{
+			while (s[i] && s[i] != c)
+				second[a++] = s[i++];
+			break ;
+		}
+		else
+			while (s[i] && s[i] != c)
+				i++;
+		x++;
+	}
+	second[a] = '\0';
+	return (second);
+}
+
+static	int	count_max_substr(const char *str2, char c)
+{
+	size_t	i;
+	size_t	num_substr;
+
+	i = 0;
+	num_substr = 0;
+	while (str2[i])
+	{
+		while (str2[i] && str2[i] == c)
+			i++;
+		if (str2[i] && str2[i] != c)
+		{
+			num_substr++;
+			while (str2[i] && str2[i] != c)
+				i++;
+		}
+	}
+	return (num_substr);
+}
+
+static char	*memorydup(const char *s, char c, size_t j)
+{
+	char		*second;
+	size_t		i;
+
+	i = 0;
+	while (s[i])
+		i++;
+	second = malloc(sizeof(char) * memory_substr(s, c, j));
+	if (second == NULL)
+		return (NULL);
+	copy_substr(s, c, j, second);
+	return (second);
+}
+
+char	**ft_split(char const *s, char c)
+{
+	char		**result;
+	size_t		j;
+	size_t		max_substr;
+
+	j = 0;
+	max_substr = count_max_substr(s, c);
+	if (!s)
+		return (NULL);
+	result = malloc(sizeof(char *) * (max_substr + 1));
+	if (result == NULL)
+		return (NULL);
+	while (max_substr > j)
+	{
+		result[j] = memorydup(s, c, j);
+		if (result[j] == NULL)
+		{
+			while (j > 0)
+				free (result[--j]);
+			free (result);
+			return (NULL);
+		}
+		j++;
+	}
+	result[j] = NULL;
+	return (result);
+}
